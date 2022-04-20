@@ -1,0 +1,15 @@
+# latex
+*.aux
+*.log
+*.out
+*.toc
+*.run.xml
+*.bib
+*.synctex.gz
+
+# modelsim
+*.mti
+*.mpf
+*.wlf
+transcript
+/*/modelsim/work/*
