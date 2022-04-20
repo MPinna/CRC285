@@ -5,3 +5,54 @@
 %         Created on 08/04/2022
 %-------------------------------------------------------------------------------
 \chapter{Introduction}\label{ch:introduction}
+The work is organized as follows:
+%TODO add work structure
+\begin{itemize}
+	\item In
+	\item In
+	\item In
+\end{itemize}
+
+\section{Algorithm description}\label{sec:alg_description}
+A Cyclic Redundancy Check (CRC) algorithm is a technique used in digital networks that uses redundant bits to detect accidental changes in digital data.\\
+Let us supposed to have a \textit{sender} (S) and a \textit{receiver} (R) at the two end of a communication channel.\\
+To each message M of \texttt{m} bits being sent by S, an additional section (the Frame Control Sequence, or FCS) of \texttt{f} redundant bits is added, whose value is computed performing a polynomial division between the message M (the dividend) and a polynomial G (the divisor) called \textit{generator} and calculating the remainder of such division.\\
+Upon reception, R performs the same division and, depending on the value of the remainder, it is able to check whether the message M has been corrupted during transmission.\\
+
+\noindent More in detail:
+\begin{itemize}[leftmargin=0pt, topsep=0pt,itemsep=-1ex,partopsep=1ex,parsep=1ex]
+	\item[-] let $M$ be an \texttt{m} bits long binary string.\\
+	An \texttt{m-1} degree polynomial $M(x)$ is associated to it, such that the \textit{i}-th coefficient of the polynomial is equal to the \textit{i}-th bit of the string (e.g. $100101111 \Rightarrow x^{8} + x^{5} + x^{3} + x^{2} + x + 1$).\\
+	\item[-] Let $G(x)$ be the generator polynomial whose binary representation is \texttt{f + 1} bits long (the degree of G(x) will therefore be \texttt{f}).\\
+M is shifted to the left by \texttt{f} positions, padding to the right with \texttt{f} zeros. This corresponds to multiplying $M(x)$ by $x^f$.\\
+	\item[-] The FCS is built as follows:\\
+	a polynomial \textit{long division} between $x^{f}{\cdot}M(x)$ and $G(x)$ is performed, using finite field arithmetic on the Galois Field GF(2). Let $Q(x)$ and $R(X)$ be the quotient and the remainder of such division, respectively. \\
+	It follows that 
+	\begin{equation}
+		x^{f}{\cdot}M(x) = Q(x)\cdot G(x) + R(x)
+		\label{eq:polynomial1}
+	\end{equation}
+\\
+	If we subtract $R(x)$ from both sides of the equation, we get
+	\begin{equation}
+			x^{f}{\cdot}M(x) - R(x) = Q(x)\cdot G(x)
+			\label{eq:polynomial2}
+	\end{equation}
+	\item[-] The polynomial on the left-hand side of the equation is divisible by $G(x)$ and contains the original message M in the \texttt{m} highest bits and the FCS in the \texttt{f} lower bits (by definition, the degree of $R(X)$ is strictly less than \texttt{f}, so it can be represented on \texttt{f }bits).\\
+	\item[-] This \texttt{m+f} bits long string M{$|$}FCS is what will be sent to the receiver.\\
+	\item[-] The receiver can check the integrity of the message by dividing M{$|$}FCS by $G(x)$ and checking whether the remainder is equal to 0: if it is, then the message M has likely not been corrupted during transmission, otherwise it has and has to be discarded.
+\end{itemize}
+\hfill \break
+In this particular implementation, M will be 56 bits long, the generator will be
+
+	\begin{equation}
+		\begin{split}
+			x^{8} + x^{4} + x^{3} + x^{2} + 1
+	  	\end{split}
+	\quad\leftrightarrow\quad
+  		\begin{split}
+			100011101
+  		\end{split}
+	\label{eq:generator}
+	\end{equation}
+therefore the FCS will be 8 bits long, for a total of 64 bits to be sent for each message.
