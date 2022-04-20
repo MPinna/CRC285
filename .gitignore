@@ -6,6 +6,8 @@
 *.run.xml
 *.bib
 *.synctex.gz
+*.bbl
+*.blg
 
 # modelsim
 *.mti
