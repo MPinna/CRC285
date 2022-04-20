@@ -56,3 +56,58 @@ In this particular implementation, M will be 56 bits long, the generator will be
 	\label{eq:generator}
 	\end{equation}
 therefore the FCS will be 8 bits long, for a total of 64 bits to be sent for each message.
+\paragraph{Example}
+\mbox{}\\
+Let us use as an example the transmission of the word ``hi'' encoded in ASCII.\\
+The binary string corresponding to ``hi'' is:
+	\begin{equation}
+	01101000\:\:01101001
+	\label{eq:example_binary}	
+	\end{equation}
+We first pad it with zeros
+	\begin{equation}
+	01101000\:\:01101001\:\:00000000
+	\label{eq:example_padded}	
+	\end{equation}
+then we compute the FCS by performing the long division between \ref{eq:example_padded} and \ref{eq:generator}.\\
+
+\newdimen\digitwidth
+\settowidth\digitwidth{0}
+\def~{\hspace{\digitwidth}}
+
+
+\def\divrule#1#2{%
+\noalign{\moveright#1\digitwidth%
+\vbox{\hrule width#2\digitwidth}}}
+\begin{tabular}[b]{@{}r@{}}
+\begin{tabular}[t]{@{}l@{}}
+011010000110100100000000\\
+~100011101\\
+\divrule{1}{9}
+~0101111001\\
+~~100011101\\
+\divrule{2}{9}
+~~00110010001\\
+~~~~100011101\\
+\divrule{4}{9}
+~~~~0100011000\\
+~~~~~100011101\\
+\divrule{5}{9}
+~~~~~000000101010000\\
+~~~~~~~~~~~100011101\\
+\divrule{11}{9}
+~~~~~~~~~~~00100110100\\
+~~~~~~~~~~~~~100011101\\
+\divrule{13}{9}
+~~~~~~~~~~~~~000\textbf{10100100}\\
+\end{tabular}
+\end{tabular}
+\\
+\hfill \break
+The remainder R is $10100100$. R is subtracted from (\ref{eq:example_padded}) to create the FCS in the 8 lower bits, yielding the following string
+
+	\begin{equation}
+	01101000\:\:01101001\:\:01011011
+	\label{eq:example_with_FCS}	
+	\end{equation}
+
