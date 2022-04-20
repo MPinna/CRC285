@@ -40,7 +40,7 @@ M is shifted to the left by \texttt{f} positions, padding to the right with \tex
 			x^{f}{\cdot}M(x) - R(x) = Q(x)\cdot G(x)
 			\label{eq:polynomial2}
 	\end{equation}
-	\item[-] The polynomial on the left-hand side of the equation is divisible by $G(x)$ and contains the original message M in the \texttt{m} highest bits and the FCS in the \texttt{f} lower bits (by definition, the degree of $R(X)$ is strictly less than \texttt{f}, so it can be represented on \texttt{f }bits).\\
+	\item[-] The polynomial on the left-hand side of the equation is divisible by $G(x)$ and contains the original message M in the \texttt{m} highest bits and the FCS in the \texttt{f} lower bits (by construction, the degree of $R(X)$ is strictly less than \texttt{f}, so it can be represented on \texttt{f }bits).\\
 	\item[-] This \texttt{m+f} bits long string M{$|$}FCS is what will be sent to the receiver.\\
 	\item[-] The receiver can check the integrity of the message by dividing M{$|$}FCS by $G(x)$ and checking whether the remainder is equal to 0: if it is, then the message M has likely not been corrupted during transmission, otherwise it has and has to be discarded.
 \end{itemize}
@@ -124,6 +124,7 @@ There are different implementations of CRC algorithms, each with its own polynom
 \section{Possible architectures}\label{sec:architectures}
 Two different architectures were identified to implement the algorithm:
 \begin{itemize}
-\item the first one simply implements the long division shown in \ref{sec:alg_description};\\
-\item the second one exploits the fact that, during the division, the divisor (i.e. the generator) is fixed. It is therefore possible to precompute the division for each possible byte and store the results in a LUT. This solution is likely to be more efficient in terms of speed, at the expense of a greater use of resources since a 256x1B LUT has to be created.
+\item the first one simply implements the long division shown in \ref{sec:alg_description} using shift registers, accumulators, counters and XOR gates;\\
+\item the second one exploits the facts that during the division, the divisor (i.e. the generator) is fixed and that in GF(2) there is no carry, therefore adjacent bytes have no influence on each other during the procedure. It is then possible to precompute the division for each possible byte and store the results in a LUT.\\
+This allows to perform the division byte by byte, thus speeding up the whole process. This solution will be more efficient in terms of speed, at the expense of a greater use of resources on the FPGA since a 256x1B LUT has to be created.
 \end{itemize}
