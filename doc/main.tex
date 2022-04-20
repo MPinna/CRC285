@@ -71,7 +71,7 @@ citestyle=authoryear
 \newcommand\inputpgf[2]{{
 \let\pgfimageWithoutPath\pgfimage
 \renewcommand{\pgfimage}[2][]{\pgfimageWithoutPath[##1]{#1/##2}}
-\input{#1/#2}
+%\input{#1/#2}
 }}
 % dedication environment
 \newenvironment{dedication}
@@ -156,6 +156,5 @@ citestyle=authoryear
 \include{synth_results}
 \include{conclusions}
 \include{appendices}
-\printbibliography
 
 \end{document}
