@@ -111,3 +111,17 @@ The remainder R is $10100100$. R is subtracted from (\ref{eq:example_padded}) to
 	\label{eq:example_with_FCS}	
 	\end{equation}
 
+
+\section{Possible applications}\label{sec:applications}
+CRC algorithms are used extensively in various data transmission technologies and protocols: SATA, USB, Ethernet, CDMA, Bluetooth, etc.\\
+They are also found in several standards, programs and file formats such as MPEG-2, PNG, Gzip, to name a few.\\
+There are different implementations of CRC algorithms, each with its own polynomial. The choice of the polynomial (both its degree and its coefficients) depend on several factors such as the maximum desired overhead and the sensitivity to different errors.\\
+
+\noindent An important remark to be made is that such algorithms protect against \textit{accidental} corruption of data, but they are not suited against \textit{intentional} alteration of data, since a valid CRC to attach to the tampered message can easily be computed once the algorithm is known.
+
+\section{Possible architectures}\label{sec:architectures}
+Two different architectures were identified to implement the algorithm:
+\begin{itemize}
+\item the first one simply implements the long division shown in \ref{sec:alg_description};\\
+\item the second one exploits the fact that, during the division, the divisor (i.e. the generator) is fixed. It is therefore possible to precompute the division for each possible byte and store the results in a LUT. This solution is likely to be more efficient in terms of speed, at the expense of a greater use of resources since a 256x1B LUT has to be created.
+\end{itemize}
