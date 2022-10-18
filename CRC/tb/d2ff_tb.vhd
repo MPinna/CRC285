@@ -3,10 +3,10 @@ use IEEE.std_logic_1164.all;
 use IEEE.std_logic_unsigned.all;
 use IEEE.numeric_std.all;
 
-entity D2FF_TB is
-end entity D2FF_TB;
+entity d2ff_tb is
+end entity d2ff_tb;
 
-architecture beh of D2FF_TB is
+architecture beh of d2ff_tb is
 
     constant clk_period :   time    :=  100 ns;
     
