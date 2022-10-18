@@ -3,12 +3,11 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity PIPOShiftReg is
-    generic ( 
-        Nbit        : positive := 8;
-        ShiftLen    : positive := 1
+    generic( 
+        Nbit        : positive  := 8;
+        ShiftLen    : natural   := 1
     );
-    port
-    (
+    port(
         clk     :   in  std_logic;
         reset   :   in  std_logic;
         en      :   in  std_logic;  -- necessary?
@@ -29,7 +28,7 @@ architecture struct of PIPOShiftReg is
             d0          :   in  std_logic;
             d1          :   in  std_logic;
             q           :   out std_logic
-            );
+        );
         end component D2FF;
         
     signal q_s  : std_logic_vector(Nbit - 1 downto 0);
