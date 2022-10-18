@@ -9,9 +9,10 @@ end entity PIPOShiftReg_tb;
 architecture bhv of PIPOShiftReg_tb is
     
     -- Testbench constants
-    constant CLK_PERIOD     :   time    := 10 ns;
-    constant T_RESET        :   time    := 25 ns;
-    constant SHIFTREG_BIT   :   natural := 8;
+    constant CLK_PERIOD     :   time        := 10 ns;
+    constant T_RESET        :   time        := 25 ns;
+    constant SHIFTREG_BIT   :   positive    := 8;
+    constant SHIFT_LEN      :   natural     := 1;
 
     -- Testbench signals
     signal  clk_tb      :   std_logic   := '0';
@@ -24,7 +25,10 @@ architecture bhv of PIPOShiftReg_tb is
 
     -- Components
     component PIPOShiftReg is
-        generic(Nbit : natural := 8);
+        generic(
+            Nbit        : positive  := 8;
+            ShiftLen    : natural   := 1
+        );
         port(
             clk     :   in  std_logic;
             reset   :   in  std_logic;
@@ -40,8 +44,11 @@ architecture bhv of PIPOShiftReg_tb is
     clk_tb <= not clk_tb after CLK_PERIOD/2 when testing else '0';
     reset_tb <= '1' after T_RESET;
 
-    PIPO_ShiftReg_DUT: PIPOShiftReg
-        generic map(Nbit => SHIFTREG_BIT)
+    PIPOShiftReg_DUT: PIPOShiftReg
+        generic map(
+            Nbit        => SHIFTREG_BIT,
+            ShiftLen    => SHIFT_LEN
+        )
         port map
         (
             clk     =>  clk_tb,
@@ -61,7 +68,6 @@ architecture bhv of PIPOShiftReg_tb is
         elsif(rising_edge(clk_tb)) then
             case(t) is
                 when 1  =>
-                    
                     en_tb   <=  '1';
                     d_tb    <= "11001100";
                     sel_tb  <=  '0'; -- read from input, don't shift
