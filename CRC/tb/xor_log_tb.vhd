@@ -8,7 +8,7 @@ end entity XOR_log_tb;
 architecture beh of XOR_log_tb is
     
     constant XOR_BITS       :   natural := 9;
-    constant CLK_PERIOD     :   time    := 100ns;
+    constant CLK_PERIOD     :   time    := 100 ns;
 
     signal clk_tb	    :   std_logic := '0';
     signal d_in_tb  :   std_logic_vector(XOR_BITS - 1 downto 0) :=(others => '0');
