@@ -1,6 +1,8 @@
 library IEEE;
 use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.math_real."log2";
+use IEEE.math_real."ceil";
 
 entity counter_tb is
 end entity counter_tb;
@@ -10,8 +12,8 @@ architecture beh of counter_tb is
     -- Testbench constants
     constant CLK_PERIOD :   time    := 10 ns;
     constant T_RESET    :   time    := 25 ns;
-    constant CTR_BITS   :   natural := 6;
-	constant MAX_COUNT	:	natural	:= 56;
+	constant MAX_COUNT	:	natural	:= 58;
+    constant CTR_BITS   :   natural := natural(ceil(log2(real(MAX_COUNT))));
    
     -- Testbench signals
     signal clk_tb           :   std_logic   := '0';
@@ -22,14 +24,14 @@ architecture beh of counter_tb is
 
 
     component Counter is
-        generic(Counter_N 	: natural := 6;
-				max			: natural := 56
-			);
+        generic(--Counter_N 	: natural := 6;
+			N_cycles : natural := 56
+		);
         port(
           clk       : in  std_logic;
           a_rst_n   : in  std_logic;
-          increment : in  std_logic_vector(Counter_N - 1 downto 0);
-          cntr_out  : out std_logic_vector(Counter_N - 1 downto 0)
+          increment : in  std_logic_vector(CTR_BITS - 1 downto 0);
+          cntr_out  : out std_logic_vector(CTR_BITS - 1 downto 0)
         );
     end component;
 
@@ -41,8 +43,8 @@ architecture beh of counter_tb is
     Counter_DUT: Counter
 	generic map
 		(
-			Counter_N	=> CTR_BITS,
-			max			=> MAX_COUNT
+			--Counter_N	=> CTR_BITS,
+			N_cycles => MAX_COUNT
 			)
 			port map
 				(

@@ -1,6 +1,8 @@
 library ieee;
 use ieee.std_logic_1164.all;
 use IEEE.numeric_std.all;
+use IEEE.math_real."log2";
+use IEEE.math_real."ceil";
 
 --     ┌─────────────────────┐
 --     │     ┌────────────┐  │
@@ -14,32 +16,33 @@ use IEEE.numeric_std.all;
 entity Counter is
 	generic
 	(
-		Counter_N 	: natural 	:= 8;
-		max 		: natural 	:= 56
+		Counter_N 		: natural 	:= 6;
+		N_cycles 		: natural 	:= 56
 	);
   	port(
 		clk       : in  std_logic;
 		a_rst_n   : in  std_logic;
 		-- move incremenet to generic() ?
-		increment : in  std_logic_vector(Counter_N - 1 downto 0);
-		cntr_out  : out std_logic_vector(Counter_N - 1 downto 0)
+		increment : in  std_logic_vector(natural(ceil(log2(real(N_cycles)))) - 1 downto 0);
+		cntr_out  : out std_logic_vector(natural(ceil(log2(real(N_cycles)))) - 1 downto 0)
     );
 end Counter;
 	
 architecture struct of Counter is
 	
 	-- Constants
-	constant MAX_COUNT		:	std_logic_vector := std_logic_vector(to_unsigned(max, Counter_N));
+	constant COUNTER_BITS	:	natural	:= natural(ceil(log2(real(N_cycles))));
+	constant NUM_OF_CYCLES	:	std_logic_vector := std_logic_vector(to_unsigned(N_cycles, COUNTER_BITS));
 	constant A_RST_VALUE	:	std_logic	:=	'0';
 
 	-- Signals
 
 	-- Output of the fullAdder_N
-	signal fullAdder_out	: std_logic_vector(Counter_N - 1 downto 0) 		:= (others => '0');
+	signal fullAdder_out	: std_logic_vector(COUNTER_BITS - 1 downto 0) 		:= (others => '0');
 	-- Output of the DFF_N
-	signal dffn_out 		: std_logic_vector(Counter_N - 1 downto 0)		:= (others => '0');
+	signal dffn_out 		: std_logic_vector(COUNTER_BITS - 1 downto 0)		:= (others => '0');
 	-- Second signal needed to implement the max count check
-	signal accumulator		: std_logic_vector(Counter_N - 1 downto 0)		:= (others => '0');
+	signal accumulator		: std_logic_vector(COUNTER_BITS - 1 downto 0)		:= (others => '0');
 	
 	-- Components declaration
 	component RippleCarryAdder is
@@ -67,7 +70,7 @@ architecture struct of Counter is
 	begin
    
 		RIPPLE_CARRY_ADDER_MAP :  RippleCarryAdder 
-			generic map(RCA_N	=>	Counter_N)
+			generic map(RCA_N	=>	COUNTER_BITS)
 			port map(
 				a    => increment,
 				b    => accumulator,
@@ -77,7 +80,7 @@ architecture struct of Counter is
 			);
 			
 		DFF_N_MAP : DFF_N 
-			generic map(DFF_bit => Counter_N)
+			generic map(DFF_bit => COUNTER_BITS)
 			port map( 
 				clk     => clk,
 				a_rst_n => a_rst_n,
@@ -87,7 +90,7 @@ architecture struct of Counter is
 	        );
 
 	    -- Mapping the output
-	    accumulator <= dffn_out when dffn_out < MAX_COUNT
+	    accumulator <= dffn_out when dffn_out < NUM_OF_CYCLES
 					else (others => '0');
 		cntr_out <= accumulator;
 	   
