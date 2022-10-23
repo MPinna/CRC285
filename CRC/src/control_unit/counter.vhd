@@ -16,13 +16,11 @@ use IEEE.math_real."ceil";
 entity Counter is
 	generic
 	(
-		Counter_N 		: natural 	:= 6;
-		N_cycles 		: natural 	:= 56
+		N_cycles 		: natural 	:= 58
 	);
   	port(
 		clk       : in  std_logic;
 		a_rst_n   : in  std_logic;
-		-- move incremenet to generic() ?
 		increment : in  std_logic_vector(natural(ceil(log2(real(N_cycles)))) - 1 downto 0);
 		cntr_out  : out std_logic_vector(natural(ceil(log2(real(N_cycles)))) - 1 downto 0)
     );

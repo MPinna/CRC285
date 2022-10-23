@@ -12,9 +12,9 @@ architecture beh of counter_tb is
     -- Testbench constants
     constant CLK_PERIOD :   time    := 10 ns;
     constant T_RESET    :   time    := 25 ns;
-	constant MAX_COUNT	:	natural	:= 58;
-    constant CTR_BITS   :   natural := natural(ceil(log2(real(MAX_COUNT))));
-   
+	constant N_CYCLES	:	natural	:= 58;
+    constant CTR_BITS   :   natural := natural(ceil(log2(real(N_CYCLES))));
+	constant INCREMENT 	:	natural := 2;
     -- Testbench signals
     signal clk_tb           :   std_logic   := '0';
     signal a_rst_n_tb       :   std_logic   := '0';
@@ -24,8 +24,8 @@ architecture beh of counter_tb is
 
 
     component Counter is
-        generic(--Counter_N 	: natural := 6;
-			N_cycles : natural := 56
+        generic(
+			N_cycles : natural := 58
 		);
         port(
           clk       : in  std_logic;
@@ -39,12 +39,10 @@ architecture beh of counter_tb is
   
     clk_tb <= not clk_tb after CLK_PERIOD/2 when testing else '0';
     a_rst_n_tb <= '1' after T_RESET;
-	-- set increment to 1 (set increment LSB to 1)
     Counter_DUT: Counter
 	generic map
 		(
-			--Counter_N	=> CTR_BITS,
-			N_cycles => MAX_COUNT
+			N_cycles => N_CYCLES
 			)
 			port map
 				(
@@ -61,7 +59,8 @@ architecture beh of counter_tb is
 				increment_tb <= (others => '0');
 				t := 0;
 			elsif(rising_edge(clk_tb)) then
-				increment_tb <= (0 => '1', others => '0');
+				increment_tb <= std_logic_vector(to_unsigned(INCREMENT, CTR_BITS));
+				-- increment_tb <= (0 => '1', others => '0');
 				case(t) is
 					when 120 =>
 						testing <= false;
