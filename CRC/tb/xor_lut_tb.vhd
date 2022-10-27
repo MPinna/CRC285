@@ -28,9 +28,7 @@ architecture beh of XOR_lut_tb is
             clk <= not clk after CLK_PERIOD/2 when testing else '0';
                 
                 
-    -- -- Uncomment the appropriate line to change implementation
-    XOR_logical_DUT: XOR_logical
-    -- XOR_lut_DUT: XOR_lut
+    XOR_lut_DUT: XOR_LUT
         generic map(Nbit => XOR_BITS)
         port map(
             d_in    =>  d_in_tb,
