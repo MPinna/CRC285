@@ -6,11 +6,9 @@
     crc[7:0] <- IN[7:0]
     md <- MD
 
-    ControlUnit.md_en = 0;
-    ControlUnit.msg_en = 0;
-    ControlUnit.crc_en = 0;
-    ControlUnit.acc_sel = 0;
-    ControlUnit.shift_sel = 0;
+    ControlUnit.in_en = 0;
+    ControlUnit.mid_sel = 0;
+    ControlUnit.out_en = 0;
 
 @posedge(clock 1):
     # shift register
@@ -19,8 +17,7 @@
     # accumulator
     accumulator[8:0] <- msg[55:47]
 
-    ControlUnit.acc_sel = 1;
-    ControlUnit.shift_sel = 1;
+    ControlUnit.mid_sel = 1;
     
 @posedge(clock 2..55):
     # shift register
@@ -41,6 +38,7 @@
     accumulator[0] <- PIPOShiftRegister[55]
     accumulator[8:1] <- accumulator[7:0] XOR (GENERATOR AND accumulator[8])
 
+    ControlUnit.mid_sel = 0;
     ControlUnit.out_en = 1;
 
 
@@ -50,9 +48,7 @@
     out[63:8] <- msg[55:0]
     
     ControlUnit.out_en = 0;
-    ControlUnit.msg_en = 1;
-    ControlUnit.crc_en = 1;
-    ControlUnit.md_en = 1;
+    ControlUnit.in_en = 1;
 ```
 ----------------------------------------------------------
 ----------------------------------------------------------
@@ -66,11 +62,9 @@
     crc[7:0] <- IN[7:0]
     md <- MD
     
-    ControlUnit.md_en = 0;
-    ControlUnit.msg_en = 0;
-    ControlUnit.crc_en = 0;
-    ControlUnit.acc_sel = 0;
-    ControlUnit.shift_sel = 0;
+    ControlUnit.in_en = 0;
+    ControlUnit.mid_sel = 0;
+    ControlUnit.out_en = 0;
 
 @posedge(clock 1):
     # shift register
@@ -80,8 +74,7 @@
     # accumulator
     accumulator[7:0] <- msg[55:48]
 
-    ControlUnit.acc_sel = 1;
-    ControlUnit.shift_sel = 1;
+    ControlUnit.mid_sel = 1;
  
  @posedge(clock 2..7):
     # shift register
@@ -101,15 +94,14 @@
     # accumulator
     accumulator[7:0] <- crc_LUT(accumulator[7:0]) XOR PIPOShiftRegister[55:48]
 
+    ControlUnit.mid_sel = 0;
     ControlUnit.out_en = 1
 
 @posedge(clock 9):
     # output
     out[7:0] <- accum[7:0]
     out[63:8] <- msg[55:0]
-    ControlUnit.out_en = 0;
     
-    ControlUnit.msg_en = 1;
-    ControlUnit.crc_en = 1;
-    ControlUnit.md_en = 1;
+    ControlUnit.out_en = 0;
+    ControlUnit.in_en = 1;
  ```
