@@ -11,7 +11,7 @@ architecture beh of counter_tb is
     
     -- Testbench constants
     constant CLK_PERIOD :   time    := 10 ns;
-    constant T_RESET    :   time    := 25 ns;
+    constant T_RESET    :   time    := 30 ns;
 	constant N_CYCLES	:	natural	:= 58;
     constant CTR_BITS   :   natural := natural(ceil(log2(real(N_CYCLES))));
 	constant INCREMENT 	:	natural := 2;
@@ -40,27 +40,24 @@ architecture beh of counter_tb is
     clk_tb <= not clk_tb after CLK_PERIOD/2 when testing else '0';
     a_rst_n_tb <= '1' after T_RESET;
     Counter_DUT: Counter
-	generic map
-		(
-			N_cycles => N_CYCLES
-			)
-			port map
-				(
-					clk         =>  clk_tb,
-					a_rst_n     =>  a_rst_n_tb,
-					increment   =>  increment_tb,
-					cntr_out    =>  cntr_out_tb
-					);
+	generic map(
+		N_cycles => N_CYCLES
+		)
+	port map(
+		clk         =>  clk_tb,
+		a_rst_n     =>  a_rst_n_tb,
+		increment   =>  increment_tb,
+		cntr_out    =>  cntr_out_tb
+	);
 					
-					stimuli: process(clk_tb, a_rst_n_tb)
-						variable t  : integer := 0;
-					begin
-						if(a_rst_n_tb = '0') then
+	stimuli: process(clk_tb, a_rst_n_tb)
+		variable t  : integer := 0;
+		begin
+			if(a_rst_n_tb = '0') then
 				increment_tb <= (others => '0');
 				t := 0;
 			elsif(rising_edge(clk_tb)) then
 				increment_tb <= std_logic_vector(to_unsigned(INCREMENT, CTR_BITS));
-				-- increment_tb <= (0 => '1', others => '0');
 				case(t) is
 					when 120 =>
 						testing <= false;
@@ -69,5 +66,5 @@ architecture beh of counter_tb is
 				end case;
 				t := t + 1;
 			end if;
-		end process;
+	end process;
 end architecture beh;

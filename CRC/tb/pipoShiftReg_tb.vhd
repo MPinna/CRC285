@@ -13,10 +13,11 @@ architecture bhv of PIPOShiftReg_tb is
     constant T_RESET        :   time        := 25 ns;
     constant SHIFTREG_BIT   :   positive    := 8;
     constant SHIFT_LEN      :   natural     := 1;
+    constant A_RST_VALUE    :   std_logic   := '0';
 
     -- Testbench signals
     signal  clk_tb      :   std_logic   := '0';
-    signal  reset_tb    :   std_logic   := '0';
+    signal  a_rst_n     :   std_logic   := '0';
     signal  en_tb       :   std_logic   := '0';
     signal  sel_tb      :   std_logic   := '0';
     signal  d_tb        :   std_logic_vector(SHIFTREG_BIT - 1 downto 0)   := (others => '0');
@@ -42,7 +43,7 @@ architecture bhv of PIPOShiftReg_tb is
     begin
 
     clk_tb <= not clk_tb after CLK_PERIOD/2 when testing else '0';
-    reset_tb <= '1' after T_RESET;
+    a_rst_n <= '1' after T_RESET;
 
     PIPOShiftReg_DUT: PIPOShiftReg
         generic map(
@@ -52,17 +53,17 @@ architecture bhv of PIPOShiftReg_tb is
         port map
         (
             clk     =>  clk_tb,
-            reset   =>  reset_tb,
+            reset   =>  a_rst_n,
             en      =>  en_tb,
             sel     =>  sel_tb,
             d       =>  d_tb,
             q       =>  q_tb
         );
 
-    stimuli: process(clk_tb, reset_tb)
+    stimuli: process(clk_tb, a_rst_n)
         variable t : integer := 0;
     begin
-        if(reset_tb = '0') then
+        if(a_rst_n = A_RST_VALUE) then
             d_tb <= (others => '0');
             t := 0;
         elsif(rising_edge(clk_tb)) then
