@@ -53,7 +53,7 @@ architecture beh of ControlUnit_bitwise is
         generic(
             N_cycles 		: natural 	:= 58
         );
-          port(
+        port(
             clk       : in  std_logic;
             a_rst_n   : in  std_logic;
             increment : in  std_logic_vector(natural(ceil(log2(real(N_cycles)))) - 1 downto 0);
