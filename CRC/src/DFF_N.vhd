@@ -3,10 +3,11 @@ use IEEE.std_logic_1164.all;
 use IEEE.numeric_std.all;
 
 entity DFF_N is
-    
-    generic(DFF_bit : natural := 8);
+    generic(
+        DFF_bit : natural := 8
+    );
 
-    port (
+    port(
         clk     :   in  std_logic;
         a_rst_n :   in  std_logic;
         en      :   in  std_logic;
@@ -17,12 +18,12 @@ entity DFF_N is
 end entity DFF_N;
 
 architecture struct of DFF_N is
-    
+    constant A_RST_VALUE : std_logic := '0';
 begin
     
-   ddf_n_proc: process(clk, a_rst_n)
-   begin
-       if(a_rst_n = '0') then
+    ddf_n_proc: process(clk, a_rst_n)
+    begin
+       if(a_rst_n = A_RST_VALUE) then
             q   <=  (others => '0');
        elsif rising_edge(clk) then
             if (en = '1') then
