@@ -4,16 +4,18 @@ use IEEE.numeric_std.all;
 
 entity PIPOShiftReg is
     generic( 
-        Nbit        : positive  := 8;
-        ShiftLen    : natural   := 1
+        ShiftReg_size   : positive  := 8;
+        ShiftLen        : natural   := 1
     );
     port(
         clk     :   in  std_logic;
         reset   :   in  std_logic;
-        en      :   in  std_logic;  -- necessary?
+        -- uncomment next line if enable is needed
+        --
+        -- en      :   in  std_logic;
         sel     :   in  std_logic;
-        d       :   in  std_logic_vector(Nbit - 1 downto 0);
-        q       :   out std_logic_vector(Nbit - 1 downto 0)
+        d       :   in  std_logic_vector(ShiftReg_size - 1 downto 0);
+        q       :   out std_logic_vector(ShiftReg_size - 1 downto 0)
     );
 end entity PIPOShiftReg;
 
@@ -22,7 +24,7 @@ architecture struct of PIPOShiftReg is
     component D2FF
         port(
             clk         :   in  std_logic;
-            a_rst_n   :   in  std_logic;
+            a_rst_n     :   in  std_logic;
             en          :   in  std_logic;
             sel         :   in  std_logic;
             d0          :   in  std_logic;
@@ -31,18 +33,19 @@ architecture struct of PIPOShiftReg is
         );
         end component D2FF;
         
-    signal q_s  : std_logic_vector(Nbit - 1 downto 0);
+    signal q_s  : std_logic_vector(ShiftReg_size - 1 downto 0);
         
 begin
     -- generation of N instances of the Double Data flip-flop
-    GEN: for i in 0 to Nbit - 1 generate
+    GEN: for i in 0 to ShiftReg_size - 1 generate
         -- first D2FF, d1 is always '0'
         FIRST: if i < ShiftLen generate
             FF_1: D2FF
             port map(
                 clk         =>  clk,
                 a_rst_n   =>  reset,
-                en          =>  en,
+                -- en          =>  en,
+                en          =>  '1',
                 sel         =>  sel,
                 d0          =>  d(i),
                 d1          =>  '0',
@@ -50,12 +53,13 @@ begin
             );
         end generate FIRST;
 
-        INTERNAL: if i >= ShiftLen  and i < Nbit - 1 generate
+        INTERNAL: if i >= ShiftLen  and i < ShiftReg_size - 1 generate
             FF_I: D2FF
             port map(
                 clk     =>  clk,
                 a_rst_n =>  reset,
-                en      =>  en,
+                -- en      =>  en,
+                en      =>  '1',
                 sel     =>  sel,
                 d0      =>  d(i),
                 d1      =>  q_s(i-ShiftLen),
@@ -63,12 +67,13 @@ begin
             );
         end generate INTERNAL;
         
-        LAST: if i = Nbit - 1 generate
+        LAST: if i = ShiftReg_size - 1 generate
             FF_N: D2FF
             port map(
                 clk         =>  clk,
-                a_rst_n   =>  reset,
-                en          =>  en,
+                a_rst_n     =>  reset,
+                -- en          =>  en,
+                en          =>  '1',
                 sel         =>  sel,
                 d0          =>  d(i),
                 d1          =>  q_s(i-ShiftLen),

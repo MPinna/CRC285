@@ -18,7 +18,7 @@ architecture bhv of PIPOShiftReg_tb is
     -- Testbench signals
     signal  clk_tb      :   std_logic   := '0';
     signal  a_rst_n     :   std_logic   := '0';
-    signal  en_tb       :   std_logic   := '0';
+    -- signal  en_tb       :   std_logic   := '0';
     signal  sel_tb      :   std_logic   := '0';
     signal  d_tb        :   std_logic_vector(SHIFTREG_BIT - 1 downto 0)   := (others => '0');
     signal  q_tb        :   std_logic_vector(SHIFTREG_BIT - 1 downto 0);
@@ -27,16 +27,16 @@ architecture bhv of PIPOShiftReg_tb is
     -- Components
     component PIPOShiftReg is
         generic(
-            Nbit        : positive  := 8;
-            ShiftLen    : natural   := 1
+            ShiftReg_size   : positive  := 8;
+            ShiftLen        : natural   := 1
         );
         port(
             clk     :   in  std_logic;
             reset   :   in  std_logic;
-            en      :   in  std_logic;  -- necessary?
+            -- en      :   in  std_logic;  -- necessary?
             sel     :   in  std_logic;
-            d       :   in  std_logic_vector(Nbit - 1 downto 0);
-            q       :   out std_logic_vector(Nbit - 1 downto 0)
+            d       :   in  std_logic_vector(ShiftReg_size - 1 downto 0);
+            q       :   out std_logic_vector(ShiftReg_size - 1 downto 0)
         );
     end component;
 
@@ -47,14 +47,14 @@ architecture bhv of PIPOShiftReg_tb is
 
     PIPOShiftReg_DUT: PIPOShiftReg
         generic map(
-            Nbit        => SHIFTREG_BIT,
-            ShiftLen    => SHIFT_LEN
+            ShiftReg_size   => SHIFTREG_BIT,
+            ShiftLen        => SHIFT_LEN
         )
         port map
         (
             clk     =>  clk_tb,
             reset   =>  a_rst_n,
-            en      =>  en_tb,
+            -- en      =>  en_tb,
             sel     =>  sel_tb,
             d       =>  d_tb,
             q       =>  q_tb
@@ -69,7 +69,6 @@ architecture bhv of PIPOShiftReg_tb is
         elsif(rising_edge(clk_tb)) then
             case(t) is
                 when 1  =>
-                    en_tb   <=  '1';
                     d_tb    <= "11001100";
                     sel_tb  <=  '0'; -- read from input, don't shift
                 when 2  =>
