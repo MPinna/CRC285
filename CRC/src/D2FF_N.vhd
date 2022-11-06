@@ -4,16 +4,16 @@ use IEEE.numeric_std.all;
 
 entity D2FF_N is
     generic( 
-        Nbit        : positive  := 8
+        D2FF_N_size : positive  := 8
     );
     port(
         clk     :   in  std_logic;
         a_rst_n :   in  std_logic;
         en      :   in  std_logic;
         sel     :   in  std_logic;
-        d0      :   in  std_logic_vector(Nbit - 1 downto 0);
-        d1      :   in  std_logic_vector(Nbit - 1 downto 0);
-        q       :   out std_logic_vector(Nbit - 1 downto 0)
+        d0      :   in  std_logic_vector(D2FF_N_size - 1 downto 0);
+        d1      :   in  std_logic_vector(D2FF_N_size - 1 downto 0);
+        q       :   out std_logic_vector(D2FF_N_size - 1 downto 0)
     );
 end entity D2FF_N;
 

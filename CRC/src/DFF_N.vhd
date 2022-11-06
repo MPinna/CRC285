@@ -4,15 +4,15 @@ use IEEE.numeric_std.all;
 
 entity DFF_N is
     generic(
-        DFF_bit : natural := 8
+        DFF_N_size : natural := 8
     );
 
     port(
         clk     :   in  std_logic;
         a_rst_n :   in  std_logic;
         en      :   in  std_logic;
-        d       :   in  std_logic_vector(DFF_bit - 1 downto 0);
-        q       :   out std_logic_vector(DFF_bit - 1 downto 0)
+        d       :   in  std_logic_vector(DFF_N_size - 1 downto 0);
+        q       :   out std_logic_vector(DFF_N_size - 1 downto 0)
     );
 
 end entity DFF_N;
