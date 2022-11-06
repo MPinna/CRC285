@@ -22,9 +22,6 @@ use IEEE.math_real."ceil";
 --
 
 entity ControlUnit_LUT is
-    generic(
-        CU_bits  :   natural := 4
-    );
     port (
         clk     :   in  std_logic;
         a_rst_n :   in  std_logic;
@@ -37,18 +34,18 @@ end entity ControlUnit_LUT;
 architecture beh of ControlUnit_LUT is
     
     -- Constants
-    constant CTR_INCREMENT  :   natural :=  1;
-    constant CTR_CYCLES     :   natural :=  10;
+    constant CTR_CYCLES : natural := 10;  
+    constant CTR_INCREMENT  :   natural := 1;
 
-    constant PHASE_0_END    :   natural :=  0;
-    constant PHASE_1_END    :   natural :=  2;
-    constant PHASE_2_END    :   natural :=  7;
-    constant PHASE_3_END    :   natural :=  8;
-    constant PHASE_4_END    :   natural :=  9;
+    constant PHASE_0_END    :   natural := 0;
+    constant PHASE_1_END    :   natural := 2;
+    constant PHASE_2_END    :   natural := 7;
+    constant PHASE_3_END    :   natural := 8;
+    constant PHASE_4_END    :   natural := 9;
 
     -- Signals
     -- output of the Counter
-    signal  cntr_out_s      :   std_logic_vector(CU_bits -1 downto 0) := (others => '0');
+    signal  cntr_out_s      :   std_logic_vector(natural(ceil(log2(real(CTR_CYCLES)))) - 1 downto 0) := (others => '0');
 
     -- Components
     component Counter is
@@ -72,7 +69,7 @@ begin
         port map(
             clk         =>  clk,
             a_rst_n     =>  a_rst_n,
-            increment   =>  std_logic_vector(to_unsigned(CTR_INCREMENT, CU_bits)),
+            increment   =>  std_logic_vector(to_unsigned(CTR_INCREMENT, natural(ceil(log2(real(CTR_CYCLES)))))),
             cntr_out    =>  cntr_out_s
         );
 
