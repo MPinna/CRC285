@@ -103,8 +103,6 @@ architecture struct of CRC_bitwise is
     constant C_XOR_INPUT_SIZE  :  natural := 9;
     constant C_XOR_OUTPUT_SIZE :  natural := C_XOR_INPUT_SIZE - 1;
     
-    constant C_CTRL_UNIT_CYCLES : natural := 58;
-
     constant A_RST_VALUE        : std_logic := '0';
 
     -- ##### Signals #####
