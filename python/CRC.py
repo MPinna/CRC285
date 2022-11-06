@@ -1,4 +1,4 @@
-from math import floor
+from math import floor, ceil
 from random import random
 
 INPUT_BITS_SENDER = 56
@@ -8,41 +8,47 @@ INPUT_BITS_RECEIVER = 64
 GENERATOR = "100011101"
 
 SENDER_INPUTS = [
-    'f9e70f4d2b6ed3',
-    '49dbf2d3fca778',
-    'e34a300fa4c345',
-    'd8c66625791098',
-    'c387f7b71ddd50',
-    '58de7943c3b4e1',
-    '7a32768bdb8fb4',
-    '8d73243271fdf2',
-    '1ad743298a5b0c',
-    '0526abfa59289d'
+    "0526abfa59289d",
+    "1ad743298a5b0c",
+    "49dbf2d3fca778",
+    "58de7943c3b4e1",
+    "7a32768bdb8fb4",
+    "8d73243271fdf2",
+    "c387f7b71ddd50",
+    "d8c66625791098",
+    "e34a300fa4c345",
+    "f9e70f4d2b6ed3"
     ]
 
 RECEIVER_INPUTS = [
-    "f9e70f4d2b6ed389",
+    "0526abfa59289d75",
+    "1ad743298a5b0c13",
     "49dbf2d3fca7787a",
-    "e34a300fa4c3451d",
-    "d8c66625791098b7",
-    "c387f7b71ddd502e",
     "58de7943c3b4e1f7",
     "7a32768bdb8fb458",
     "8d73243271fdf286",
-    "1ad743298a5b0c13",
-    "0526abfa59289d75"
+    "c387f7b71ddd502e",
+    "d8c66625791098b7",
+    "e34a300fa4c3451d",
+    "f9e70f4d2b6ed389",
 ]
 
 def hex_string_to_bit_string(hex_string: str) -> str:
-    hex_string = hex_string.lstrip("0x")
+    if(hex_string[:2] == "0x"):
+        hex_string = bit_string[2:]
+    bit_string_len = len(hex_string)*4
     i = int(hex_string, 16)
-    bit_string = format(i, 'b')
+    bit_string = format(i, f"0{bit_string_len}b")
     return bit_string
 
 
 def bit_string_to_hex_string(bit_string: str) -> str:
+    if(bit_string[:2] == "0b"):
+        bit_string = bit_string[2:]
+    hex_string_len = ceil(len(bit_string)/4)
     i = int(bit_string, 2)
-    return str(hex(i)).lstrip("0x")
+    hex_string = format(i, f"0{hex_string_len}x")
+    return hex_string
 
 
 def generate_random_sender_input():
@@ -53,10 +59,6 @@ def generate_random_sender_input():
 
 
 def compute_CRC(M, G = GENERATOR) -> str:
-
-    # check if M is effectively a bit string
-    if not all(b in "01" for b in M):
-        print(f"[crc_remainder()] {M} is not a valid input")
     
     M_len = len(M)
 
@@ -74,42 +76,37 @@ def compute_CRC(M, G = GENERATOR) -> str:
     return ''.join(padded_M)[M_len:]
 
 
-# TODO clean and add comments
-def check_CRC(IN, G=GENERATOR):
+def check_CRC(IN, G=GENERATOR) -> str:
+    IN_len = len(IN) - 8
+    M = IN[0:len(IN) - 8]
 
-    # split input into message and CRC
-    CRC = IN[INPUT_BITS_SENDER:INPUT_BITS_RECEIVER]
-    M = IN[:INPUT_BITS_SENDER]
-    msg_len = len(M)
-    initial_padding = CRC
-    input_padded_array = list(M + initial_padding)
-    while '1' in input_padded_array[:msg_len]:
-        cur_shift = input_padded_array.index('1')
+    IN_list = list(IN)
+
+    # the outer while loop scans the whole message to be processed
+    while '1' in IN_list[:IN_len]:
+        MSB_index = IN_list.index('1')
+        # the inner for loop computes each step of the division
         for i in range(len(G)):
-            input_padded_array[cur_shift + i] = str(int(G[i] != input_padded_array[cur_shift + i]))
-    return ('1' not in ''.join(input_padded_array)[msg_len:])
+            # the != between single bits basically corresponds to a XOR
+            IN_list[MSB_index + i] = str(int(G[i] != IN_list[MSB_index + i]))
+    return M + (''.join(IN_list)[IN_len:])
+
 
 def CRC(IN: str, md: str) -> str:
+    IN = hex_string_to_bit_string(IN)
     SENDER_MODE = True if md == '0' else False
     ret = ""
     if(SENDER_MODE):
-        # print("Sender mode")
         ret = IN + compute_CRC(IN)
-    
-    # if receiver mode
     else:
-        # print("Receiver mode")
-        ret = IN
-        if(check_CRC(IN)):
-            ret = ret[:INPUT_BITS_SENDER] + '0'*8
-    if len(ret) < 64:
-        ret = '0'*(64 - len(ret)) + ret
-    return ret
+        ret = check_CRC(IN)
+    return bit_string_to_hex_string(ret)
 
-
-for input in SENDER_INPUTS:
-    print(CRC(hex_string_to_bit_string(input), '0'))
-
-print()
-for input in RECEIVER_INPUTS:
-    print(CRC(hex_string_to_bit_string(input), '1'))
+if __name__ == "__main__":
+    print("Sender mode")
+    for index, input in enumerate(SENDER_INPUTS):
+        output = CRC(input, '0')
+        print(f"{input} -> {output}")
+        check = CRC(output, '1')
+        # check = check_CRC(hex_string_to_bit_string(output))
+        print(f"Check: {check}")
