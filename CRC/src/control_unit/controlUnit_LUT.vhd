@@ -39,9 +39,9 @@ architecture beh of ControlUnit_LUT is
 
     constant PHASE_0_END    :   natural := 0;
     constant PHASE_1_END    :   natural := 2;
-    constant PHASE_2_END    :   natural := 7;
-    constant PHASE_3_END    :   natural := 8;
-    constant PHASE_4_END    :   natural := 9;
+    constant PHASE_2_END    :   natural := CTR_CYCLES - 3;
+    constant PHASE_3_END    :   natural := CTR_CYCLES - 2;
+    constant PHASE_4_END    :   natural := CTR_CYCLES - 1;
 
     -- Signals
     -- output of the Counter
