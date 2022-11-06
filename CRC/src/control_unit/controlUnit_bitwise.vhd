@@ -22,8 +22,7 @@ use IEEE.math_real."ceil";
 --
 
 entity ControlUnit_bitwise is
-    generic(CU_bits  :   natural := 6);
-    port (
+    port(
         clk     :   in  std_logic;
         a_rst_n :   in  std_logic;
         in_en   :   out std_logic;
@@ -44,9 +43,11 @@ architecture beh of ControlUnit_bitwise is
     constant PHASE_3_END    :   natural :=  56;
     constant PHASE_4_END    :   natural :=  57;
 
+    constant A_RST_VALUE    :   std_logic := '0';
+
     -- Signals
     -- output of the Counter
-    signal  cntr_out_s      :   std_logic_vector(CU_bits -1 downto 0) := (others => '0');
+    signal  cntr_out_s      :   std_logic_vector(natural(ceil(log2(real(CTR_CYCLES)))) -1 downto 0) := (others => '0');
 
     -- Components
     component Counter is
@@ -70,41 +71,46 @@ begin
         port map(
             clk         =>  clk,
             a_rst_n     =>  a_rst_n,
-            increment   =>  std_logic_vector(to_unsigned(CTR_INCREMENT, CU_bits)),
+            increment   =>  std_logic_vector(to_unsigned(CTR_INCREMENT, natural(ceil(log2(real(CTR_CYCLES)))))),
             cntr_out    =>  cntr_out_s
         );
 
 
-    drive_out_signals: process(cntr_out_s)
+    drive_out_signals: process(clk, cntr_out_s)
         variable current_count_v  :   integer := 0;
     begin
-        current_count_v := to_integer(unsigned(cntr_out_s));
+        if(a_rst_n = A_RST_VALUE) then
+            -- cntr_out_s <= (others => '0');
+            null;
+        elsif(rising_edge(clk)) then
+            current_count_v := to_integer(unsigned(cntr_out_s));
 
-        -- TODO: maybe replace if, elsif,... with case?
-        if current_count_v <= PHASE_0_END then -- clock 0
-            -- input registers don't read from input anymore
-            -- accumulator and shift register read from input
-            in_en   <= '0';
-            mid_sel <= '0';
-            out_en  <= '0';
-        elsif current_count_v <= PHASE_1_END then   -- clock 1
-            -- accumulator reads from feedback and
-            -- Shift register starts shifting
-            mid_sel <=  '1'; 
-        elsif current_count_v <= PHASE_2_END then   -- clock 2 to 55
-            null;
-        elsif current_count_v <= PHASE_3_END then   -- clock 56
-            -- stop computation and put result into
-            -- output register
-            mid_sel <=  '0'; --
-            out_en  <=  '1';
-        elsif current_count_v <= PHASE_4_END then   -- clock 57
-            -- output register stops reading from input and accumulator
-            -- input registers read from input
-            out_en <= '0';
-            in_en <= '1';
-        else
-            null;
+            -- TODO: maybe replace if, elsif,... with case?
+            if current_count_v <= PHASE_0_END then -- clock 0
+                -- input registers don't read from input anymore
+                -- accumulator and shift register read from input
+                in_en   <= '0';
+                mid_sel <= '0';
+                out_en  <= '0';
+            elsif current_count_v <= PHASE_1_END then   -- clock 1
+                -- accumulator reads from feedback and
+                -- Shift register starts shifting
+                mid_sel <=  '1'; 
+            elsif current_count_v <= PHASE_2_END then   -- clock 2 to 55
+                null;
+            elsif current_count_v <= PHASE_3_END then   -- clock 56
+                -- stop computation and put result into
+                -- output register
+                mid_sel <=  '0'; --
+                out_en  <=  '1';
+            elsif current_count_v <= PHASE_4_END then   -- clock 57
+                -- output register stops reading from input and accumulator
+                -- input registers read from input
+                out_en <= '0';
+                in_en <= '1';
+            else
+                null;
+            end if;
         end if;
     end process drive_out_signals;
 end architecture beh;

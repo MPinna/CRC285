@@ -10,9 +10,6 @@ architecture beh of ControlUnit_bitwise_tb is
     
     -- Components
     component ControlUnit_bitwise
-        generic(
-            CU_bits : natural   := 6
-            );
         port (
             clk     :   in  std_logic;
             a_rst_n :   in  std_logic;
@@ -42,9 +39,6 @@ architecture beh of ControlUnit_bitwise_tb is
     a_rst_n_tb <= '1' after T_RESET;
     
     ControlUnit_bitwise_DUT: ControlUnit_bitwise
-        generic map(
-            CU_bits => CU_BITS_TB
-            )
         port map(
             clk     =>  clk_tb,
             a_rst_n =>  a_rst_n_tb,
