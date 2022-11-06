@@ -55,13 +55,13 @@ architecture struct of Counter is
 	end component;
 	
 	component DFF_N is
-	generic( DFF_bit : natural := 8);
+	generic( DFF_N_size : natural := COUNTER_BITS);
 		port( 
 			clk     : in std_logic;
 			a_rst_n : in std_logic;
 			en      : in std_logic;
-			d       : in std_logic_vector(DFF_bit - 1 downto 0);
-			q       : out std_logic_vector(DFF_bit - 1 downto 0)
+			d       : in std_logic_vector(DFF_N_size - 1 downto 0);
+			q       : out std_logic_vector(DFF_N_size - 1 downto 0)
 		);
 	end component;
 	
@@ -78,7 +78,7 @@ architecture struct of Counter is
 			);
 			
 		DFF_N_MAP : DFF_N 
-			generic map(DFF_bit => COUNTER_BITS)
+			generic map(DFF_N_size => COUNTER_BITS)
 			port map( 
 				clk     => clk,
 				a_rst_n => a_rst_n,
