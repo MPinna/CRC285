@@ -7,7 +7,9 @@ end entity CRC_tb;
 
 architecture rtl of CRC_tb is
     
-    component CRC_bitwise is
+    -- comment out the appropriate line to change implementation under test
+    -- component CRC_bitwise is
+    component CRC_LUT is
         generic(
             msg_size    : natural := 56;
             CRC_size    : natural := 8
@@ -26,13 +28,16 @@ architecture rtl of CRC_tb is
     constant C_T_RESET      :   time    := 25 ns;
     constant C_MSG_SIZE     :   natural := 56;
     constant C_CRC_SIZE     :   natural := 8;
-    constant C_CYCLES       :   natural := 58;
+        -- comment out the appropriate line to change implementation under test
+    -- constant C_CYCLES       :   natural := 58; -- bitwise
+    constant C_CYCLES       :   natural := 10; -- LUT
     
     
     type longs_t is array (0 to 9) of std_logic_vector(C_MSG_SIZE + C_CRC_SIZE - 1 downto 0);
     
     constant messages_m: longs_t := (
-        x"0526abfa59289d00",
+        x"0000000000686800",
+        -- x"0526abfa59289d00",
         x"1ad743298a5b0c00",
         x"49dbf2d3fca77800",
         x"58de7943c3b4e100",
@@ -45,8 +50,8 @@ architecture rtl of CRC_tb is
         );
         
     constant messages_d: longs_t := (
-        x"0526abfa59289d75",
-        -- x"00000000006868b9",
+        -- x"0526abfa59289d75",
+        x"00000000006868b9",
         x"1ad743298a5b0c13",
         x"49dbf2d3fca7787a",
         x"58de7943c3b4e1f7",
@@ -84,7 +89,9 @@ architecture rtl of CRC_tb is
     clk_tb <= not clk_tb after C_CLK_PERIOD when testing else '0';
     a_rst_n_tb <= '1' after C_T_RESET;
 
-    CRC_dut: CRC_bitwise
+    -- comment out the appropriate line to change implementation under test
+    -- CRC_dut: CRC_bitwise
+    CRC_dut: CRC_LUT
         generic map(
             msg_size    => C_MSG_SIZE,
             CRC_size    => C_CRC_SIZE
