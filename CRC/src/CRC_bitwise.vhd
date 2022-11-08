@@ -225,7 +225,7 @@ architecture struct of CRC_bitwise is
         );
 
         
-    mux_proc: process(clk)
+    mux_proc: process(clk, md_reg_out, crc_reg_out)
     begin
         if(md_reg_out = '1') then
             mux_out <= crc_reg_out;

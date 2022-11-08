@@ -76,7 +76,7 @@ begin
         );
 
 
-    drive_out_signals: process(clk, cntr_out_s)
+    drive_out_signals: process(clk, cntr_out_s, a_rst_n)
         variable current_count_v  :   integer := 0;
     begin
         if(a_rst_n = A_RST_VALUE) then
