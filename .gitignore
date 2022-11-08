@@ -15,3 +15,15 @@
 *.wlf
 transcript
 /*/modelsim/work/*
+
+# vivado
+CRC/vivado/CRC_bitwise/CRC_bitwise.runs/*
+CRC/vivado/CRC_bitwise/CRC_bitwise.cache/*
+# *.vds
+# *.jou
+# *.pb
+# *.wdf
+# *.tcl
+# *.dcp
+# *.rst
+# *.rpt
