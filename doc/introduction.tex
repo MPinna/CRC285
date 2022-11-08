@@ -7,8 +7,8 @@
 \chapter{Introduction}\label{ch:introduction}
 The work is organized as follows:
 \begin{itemize}
-	\item this chapter contains the description of the algorithm, some of its applications and possible architecture for the implementation
-	\item in chapter \ref{ch:architecture} an in-depth explanation of the chosen architecture(s) is given
+	\item this chapter contains the description of the algorithm, some of its applications and possible architectures for the implementation
+	\item in chapter \ref{ch:architecture} an in-depth explanation of the chosen architectures is given
 	\item in chapter \ref{ch:vhdl_code} the VHDL code of each component is shown and commented
 	\item chapter \ref{ch:testplan} concerns the test plan and the testbenches used for the verification of the system
 	\item chapter \ref{ch:synth_results} shows the results of the automated logic synthesis on the Xilinx FPGA Zync platform
@@ -42,7 +42,7 @@ M is shifted to the left by \texttt{f} positions, padding to the right with \tex
 	\end{equation}
 	\item[-] The polynomial on the left-hand side of the equation is divisible by $G(x)$ and contains the original message M in the \texttt{m} highest bits and the FCS in the \texttt{f} lower bits (by construction, the degree of $R(X)$ is strictly less than \texttt{f}, so it can be represented on \texttt{f }bits).\\
 	\item[-] This \texttt{m+f} bits long string M{$|$}FCS is what will be sent to the receiver.\\
-	\item[-] The receiver can check the integrity of the message by dividing M{$|$}FCS by $G(x)$ and checking whether the remainder is equal to 0: if it is, then the message M has likely not been corrupted during transmission, otherwise it has and has to be discarded.
+	\item[-] The receiver can check the integrity of the message by dividing M{$|$}FCS by $G(x)$ and checking whether the remainder is equal to 0: if it is, then the message M has likely not been corrupted during transmission, otherwise it has and thus needs to be discarded.
 \end{itemize}
 \hfill \break
 In this particular implementation, M will be 56 bits long, the generator will be
