@@ -1,7 +1,6 @@
 
 # Generator polynomial is 100011101
 GENERATOR = int("00011101", 2)
-print(hex(GENERATOR))
 
 def compute_crc(dividend):
     b = dividend
@@ -15,14 +14,15 @@ def compute_crc(dividend):
 
 LUT = []
 
-print("Generating look-up table")
-for i in range (256):
-    crc = compute_crc(i)
-    LUT.append(crc)
+if __name__ == "__main__":
+    print("Generating look-up table")
+    for i in range (256):
+        crc = compute_crc(i)
+        LUT.append(crc)
 
-for index, entry in enumerate(LUT):
-    print(f"\"{entry:08b}\",", end="")
-    if(index % 8 == 7):
-        print()
-    else:
-        print(" ", end="")
+    for index, entry in enumerate(LUT):
+        print(f"\"{entry:02X}\",", end="")
+        if(index % 16 == 15):
+            print()
+        else:
+            print(" ", end="")
