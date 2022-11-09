@@ -46,3 +46,4 @@
     
     ControlUnit.out_en = 0;
     ControlUnit.in_en = 1;
+    
