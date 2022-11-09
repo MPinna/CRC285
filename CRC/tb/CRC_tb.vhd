@@ -36,8 +36,8 @@ architecture rtl of CRC_tb is
     type longs_t is array (0 to 9) of std_logic_vector(C_MSG_SIZE + C_CRC_SIZE - 1 downto 0);
     
     constant messages_m: longs_t := (
-        x"0000000000686800",
-        -- x"0526abfa59289d00",
+        -- x"0000000000686800",
+        x"0526abfa59289d00",
         x"1ad743298a5b0c00",
         x"49dbf2d3fca77800",
         x"58de7943c3b4e100",
@@ -50,8 +50,8 @@ architecture rtl of CRC_tb is
         );
         
     constant messages_d: longs_t := (
-        -- x"0526abfa59289d75",
-        x"00000000006868b9",
+        x"0526abfa59289d75",
+        -- x"00000000006868b9",
         x"1ad743298a5b0c13",
         x"49dbf2d3fca7787a",
         x"58de7943c3b4e1f7",
