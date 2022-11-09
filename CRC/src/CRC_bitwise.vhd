@@ -82,7 +82,20 @@ architecture struct of CRC_bitwise is
                 );
     end component XOR_logical;
             
-    component ControlUnit_bitwise is
+    -- component ControlUnit_bitwise is
+    --     port(
+    --         clk     :   in  std_logic;
+    --         a_rst_n :   in  std_logic;
+    --         in_en   :   out std_logic;
+    --         mid_sel :   out std_logic;
+    --         out_en  :   out std_logic
+    --     );
+    -- end component ControlUnit_bitwise;
+
+    component ControlUnit is
+        generic(
+            CU_cycles   :   natural := 58
+        );
         port(
             clk     :   in  std_logic;
             a_rst_n :   in  std_logic;
@@ -90,7 +103,7 @@ architecture struct of CRC_bitwise is
             mid_sel :   out std_logic;
             out_en  :   out std_logic
         );
-    end component ControlUnit_bitwise;
+    end component ControlUnit;
 
     -- ##### Constants #####
     constant C_MSG_SIZE       :   natural := msg_size;
@@ -102,6 +115,8 @@ architecture struct of CRC_bitwise is
 
     constant C_XOR_INPUT_SIZE  :  natural := 9;
     constant C_XOR_OUTPUT_SIZE :  natural := C_XOR_INPUT_SIZE - 1;
+
+    constant C_N_CYCLES     :   natural   := 58;
     
     constant A_RST_VALUE        : std_logic := '0';
 
@@ -203,7 +218,10 @@ architecture struct of CRC_bitwise is
             d_out   =>  xor_out
         );
 
-    CU : ControlUnit_bitwise
+    CU : ControlUnit
+        generic map(
+            CU_cycles => C_N_CYCLES
+        )
         port map(
             clk     => clk,
             a_rst_n => a_rst_n,

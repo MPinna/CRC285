@@ -81,8 +81,11 @@ architecture struct of CRC_LUT is
             d_out   : out   std_logic_vector(XOR_LUT_input_size - 1 downto 0)
         );
     end component XOR_LUT;
-            
-    component ControlUnit_LUT is
+
+    component ControlUnit is
+        generic(
+            CU_cycles   :   natural := 10
+        );
         port(
             clk     :   in  std_logic;
             a_rst_n :   in  std_logic;
@@ -90,7 +93,7 @@ architecture struct of CRC_LUT is
             mid_sel :   out std_logic;
             out_en  :   out std_logic
         );
-    end component ControlUnit_LUT;
+    end component ControlUnit;
 
     -- ##### Constants #####
     constant C_MSG_SIZE       :   natural := msg_size;
@@ -102,6 +105,8 @@ architecture struct of CRC_LUT is
 
     constant C_LUT_INPUT_SIZE  :  natural := 8;
     constant C_LUT_OUTPUT_SIZE :  natural := C_LUT_INPUT_SIZE;
+    
+    constant C_N_CYCLES     :   natural   := 10;
     
     constant A_RST_VALUE        : std_logic := '0';
 
@@ -203,7 +208,10 @@ architecture struct of CRC_LUT is
             d_out   =>  lut_out
         );
 
-    CU : ControlUnit_LUT
+    CU : ControlUnit
+        generic map(
+            CU_cycles => C_N_CYCLES
+        )
         port map(
             clk     => clk,
             a_rst_n => a_rst_n,
@@ -225,7 +233,7 @@ architecture struct of CRC_LUT is
         );
 
         
-    mux_proc: process(clk)
+    mux_proc: process(clk, md_reg_out, crc_reg_out)
     begin
         if(md_reg_out = '1') then
             mux_out <= crc_reg_out;
