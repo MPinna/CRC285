@@ -19,6 +19,8 @@ transcript
 # vivado
 CRC/vivado/CRC_bitwise/CRC_bitwise.runs/*
 CRC/vivado/CRC_bitwise/CRC_bitwise.cache/*
+CRC/vivado/CRC_LUT/CRC_LUT.cache/*
+CRC/vivado/CRC_LUT/CRC_LUT.runs/*
 # *.vds
 # *.jou
 # *.pb
@@ -27,3 +29,4 @@ CRC/vivado/CRC_bitwise/CRC_bitwise.cache/*
 # *.dcp
 # *.rst
 # *.rpt
+CRC/vivado/CRC_LUT/CRC_LUT.cache/wt/webtalk_pa.xml
