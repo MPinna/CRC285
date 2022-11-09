@@ -4,4 +4,16 @@
 % Author: Marco Pinna
 %         Created on 16/04/2022
 %-------------------------------------------------------------------------------
-\chapter{Conclusions}\label{ch:conclusions}
+\chapter{Conclusions and possible optimizations}\label{ch:conclusions}
+The LUT-based architecture seems to perform better than the bitwise one in every aspect: fewer clock cycles needed, higher maximum clock frequency, lower resource optimization. The power consumption also seems to be lower but, as stated in the previous chapter, it would be better to complete the implementation process for a greater confidence level on this aspect.\\
+\hfill \break
+There surely is room for further optimizations, for instance one could try to improve the components which contain the critical path in order to further increase the WNS and therefore the maximum clock frequency.\\
+Another optimization that could be made is to implement some mechanism to skip all the leading zeroes in the input, since they don't affect the final value of the CRC.\\
+\hfill \break
+While looking for optimizations on the LUT-based architecture, it was realized that \textbf{the look-up table of CRC algorithms is associative with respect to the XOR operator}, i.e.
+
+\begin{equation}\label{eq:LUT_assoc}
+table[a] \oplus table[b] = table[a \oplus b]
+\end{equation}
+\hfill \break
+This opens the way for a series of great optimizations: instead of having the entire LUT hardcoded on the chip, one could store only the LUT values for the powers of 2 and then perform a XOR between them depending on which bits are set in the number being used as index.\\

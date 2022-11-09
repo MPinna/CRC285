@@ -8,9 +8,8 @@
 
 As mentioned in \ref{sec:possible_architectures}, two architectures were identified to implement the algorithm: the first one carries out the procedure in a \textbf{bitwise} fashion; the second one works \textbf{bytewise} by means of a look-up table (LUT).\\
 In this chapter both the architectures will be analysed in detail, showing advantages and drawbacks of the two.\\
-The initial stage of the development process followed a top-down approach to identify the individual components that would comprise the entire architecture. For each component, it was studied which simpler sub-component it should have consisted of.\\
+The initial stage of the development process followed a top-down approach to identify the individual components that would comprise the entire architecture. For each component, it was studied which simpler sub-components it should consist of.\\
 The whole development process of the components was carried out with modularity in mind, so as to ease the reuse of them in the different architectures.\\
-
 
 \section{Bitwise architecture}\label{sec:bitwise_arch}
 
@@ -71,7 +70,7 @@ The LUT-based CRC works as follows:\\
 
 \
 The following pseudocode shows what happens during each clock cycle, in a finite-state machine fashion:
-\hfill \break
+\pagebreak
 
 \lstset{style=codestyle}\label{code:FSM_LUT}
 \lstinputlisting[language=python,label=code:FSM_LUT,caption={FSM pseudocode of LUT based architecture}]{code/FSM_LUT.py}
@@ -117,21 +116,21 @@ non-rising              & X                  & X                  & X           
 
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[scale=1.3,clip]{img/DFF_N_block.pdf}
+        \includegraphics[scale=1.1,clip]{img/DFF_N_block.pdf}
     \end{center}
     \vspace*{-0.5cm}
     \caption{D2FF-N.}
     \label{fig:DFFNblock}
 \end{figure}
 
-The accumulator is an instance of a \textbf{D2FF N}, i.e. a register of N bits with 2 N-bit data inputs and a \texttt{sel} input to toggle between them.\\
-Just as classical registers are arrays of D Flip Flops, a D2FF N is an array of D2FF: its \texttt{en}, \texttt{sel} and \texttt{clk} are mapped to the respective input of each individual D2FF and the i-th bit of the inputs and the output is mapped accordingly to the respective input or output of the i-th D2FF.
+The accumulator is an instance of a \textbf{D2FF-N}, i.e. a register of N bits with 2 N-bit data inputs and a \texttt{sel} input to toggle between them.\\
+Just as classical registers are arrays of D Flip Flops, a D2FF-N is an array of D2FF: its \texttt{en}, \texttt{sel} and \texttt{clk} are mapped to the respective input of each individual D2FF and the i-th bit of the inputs and the output is mapped accordingly to the respective input or output of the i-th D2FF.
 
 \subsection{PIPO Shift Register}\label{subsec:PIPOshiftreg}
 
 \begin{figure}[H]
     \begin{center}
-        \includegraphics[scale=1.3,clip]{img/PIPO_shiftreg_block.pdf}
+        \includegraphics[scale=1.1,clip]{img/PIPO_shiftreg_block.pdf}
     \end{center}
     \vspace*{-0.5cm}
     \caption{PIPO Shift Register.}
@@ -149,5 +148,11 @@ The \textbf{PIPO (Parallel-Input-Parallel-Output) Shift Register} is a shift reg
     \label{fig:CUblock}
 \end{figure}
 
-The \textbf{Control Unit} is made of a simple counter plus some simple control logic that, depending on the output of the counter, issues the correct output via the three output signals \texttt{in\_en}, \texttt{mid\_sel} and \texttt{out\_en}, the three of which are connected respectively to the input registers \textit{enable}, the accumulator and shift register \textit{select} and the output register \textit{enable.}.\\
-Depending on the architecture, the control unit will differ in the maximum count and the control logic (cfr. pseudocode in Listings \ref{code:FSM_bitwise} and \ref{code:FSM_LUT}).
+The \textbf{Control Unit} is made of a counter plus some simple control logic that, depending on the output of the counter, issues the correct commands via the  output signals \texttt{in\_en}, \texttt{mid\_sel} and \texttt{out\_en}, the three of which are connected respectively to the input registers \textit{enable}, the accumulator and shift register \textit{select} and the output register \textit{enable}.\\
+Depending on the architecture, the control unit will differ in the maximum count and the control logic (cfr. pseudocode in Listings \ref{code:FSM_bitwise} and \ref{code:FSM_LUT}).\\
+\hfill \break
+\hfill \break
+Both architectures were designed with the following assumption in mind:\\
+the upstream and downstream circuits (with respect to the CRC circuit) are both synchronous with the designed component and they know how many clock every implementation takes to compute the CRC.\\
+Should this assumption fall, a handshake mechanism would be required, both for the producer (upstream) component and for the consumer (downstream) component.\\
+The \textit{phases-structured} logic lends itself well to this type of addition: the two handshakes would be connected to the Control Unit, which could pause/resume the advance of the counter and keep the circuit in the first (last) phase as long as it is required for the producer or consumer to write or read the data.

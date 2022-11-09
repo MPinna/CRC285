@@ -11,9 +11,11 @@ The work is organized as follows:
 	\item in chapter \ref{ch:architecture} an in-depth explanation of the chosen architectures is given
 	\item in chapter \ref{ch:vhdl_code} the VHDL code of each component is shown and commented
 	\item chapter \ref{ch:testplan} concerns the test plan and the testbenches used for the verification of the system
-	\item chapter \ref{ch:synth_results} shows the results of the automated logic synthesis on the Xilinx FPGA Zync platform
+	\item chapter \ref{ch:synth_results} shows the results of the automated logic synthesis on the Xilinx Vivado Design Suite, with considerations concerning resource use, maximum clock frequency, etc.
 	\item finally in chapter \ref{ch:conclusions} conclusions are drawn and some consideration about possible optimizations or different implementations are made
 \end{itemize}
+
+The entire codebase can be found at \texttt{\href{https://github.com/MPinna/CRC285/}{https://github.com/MPinna/CRC285/}}.
 
 \section{Algorithm description}\label{sec:alg_description}
 A Cyclic Redundancy Check (CRC) algorithm is a technique used in digital networks that uses redundant bits to detect accidental changes in digital data.\\
@@ -119,7 +121,7 @@ CRC algorithms are used extensively in various data transmission technologies an
 They are also found in several standards, programs and file formats such as MPEG-2, PNG, Gzip, to name a few.\\
 There are different implementations of CRC algorithms, each with its own polynomial. The choice of the polynomial (both its degree and its coefficients) depend on several factors such as the maximum desired overhead and the sensitivity to different errors.\\
 
-\noindent An important remark to be made is that such algorithms protect against \textit{accidental} corruption of data, but they are not suited against \textit{intentional} alteration of data, since a valid CRC to attach to the tampered message can easily be computed once the algorithm is known.
+\noindent An important remark to be made is that such algorithms protect against \textit{accidental} corruption of data, but \textbf{they are not suited against \textit{intentional} alteration of data}, since a valid CRC to attach to the tampered message can easily be computed once the algorithm is known.
 
 \section{Possible architectures}\label{sec:possible_architectures}
 Two different architectures were identified to implement the algorithm:
@@ -127,5 +129,6 @@ Two different architectures were identified to implement the algorithm:
 \item the first one simply implements the long division shown in \ref{sec:alg_description} using shift registers, accumulators, counters , XOR gates, etc.\\
 In this implementation the algorithm advances bit by bit, therefore in order to ``consume" the whole message (56 bits), a total of at least 56 clock cycles is needed.
 \item the second one exploits the facts that the divisor (i.e. the generator) is fixed and that in GF(2) there is no carry, therefore adjacent bytes have no influence on each other during the algorithm. It is then possible to pre-compute the division for each possible byte and store the results in a LUT.\\
-This allows to perform the division byte by byte, thus speeding up the whole process. This solution will be more efficient in terms of speed, at the expense of a greater use of resources on the FPGA since a 256x1B LUT has to be created.
+At each step, the LUT will then be used to perform a bitwise XOR between its corresponding entry and the next byte of the message.\\
+This allows to perform the division byte by byte, thus speeding up the whole process. This solution will be more efficient in terms of speed, at the expense of a probable greater use of resources on the FPGA since a 256x1B LUT has to be created.
 \end{itemize}

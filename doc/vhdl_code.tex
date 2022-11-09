@@ -5,3 +5,116 @@
 %         Created on 16/04/2022
 %-------------------------------------------------------------------------------
 \chapter{VHDL code}\label{ch:vhdl_code}
+This chapter consists of an in-depth analysis of the VHDL codebase of the project, commenting the more interesting parts and providing the reasons behind the development choices that were made.\\
+While the initial development process followed a top-down approach to find the most appropriate architecture(s) and identify the components, the actual coding process followed a \textbf{bottom-up} approach, starting from the simplest components and basic units and going up to build progressively more complex modules.\\
+As mentioned in chapter \ref{ch:architecture}, the development process was carried out with modularity in mind: this allowed to ease the reuse of components and simplify debugging and maintenance. Furthermore, some well-known VHDL best practices were followed, especially for naming signals, constants and modules.\\
+\hfill \break
+The directory structure of the project is the following:\\
+\dirtree{%
+.1 CRC.
+.2 modelsim.
+.2 src.
+.3 DFF.vhd.
+.3 DFF\_N.vhd.
+.3 D2FF.vhd.
+.3 D2FF\_N.vhd.
+.3 PIPOShiftReg.vhd.
+.3 xor\_logical.vhd.
+.3 xor\_LUT.vhd.
+.3 control\_unit/.
+%.4 fullAdder.vhd.
+%.4 rippleCarryAdder.vhd.
+%.4 counter.vhd.
+%.4 controlUnit\_bitwise.vhd.
+%.4 controlUnit\_LUT.vhd.
+.3 CRC\_bitwise.vhd.
+.3 CRC\_LUT.vhd.
+.2 tb.
+.2 vivado.
+}
+
+\pagebreak
+
+In order not to clutter the document too much, only the most important parts of each source file will be displayed here. The complete source files can be found in the project repository linked in chapter \ref{ch:introduction}.\\
+
+
+\section{D2FF}\label{section:D2FF.vhd}
+\lstset{style=codestyle}\label{code:D2FF.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of D2FF}]{code/D2FF.vhd}
+\hfill \break
+As \ref{code:D2FF.vhd} shows, the source for D2FF is quite simple and very similar to a typical description of a classic D Flip Flop: the only difference is the presence of an additional \texttt{if..else} statement needed to multiplex the two input data signal by means of the \texttt{sel} input.\\
+
+\section{D2FF-N}\label{code:D2FF_N.vhd}
+The D2FF-N source code is exactly the same as the D2FF, except for the type of the input ports \texttt{d0} and \texttt{d1} and the output port \texttt{q}, which are all declared as \texttt{std\_logic\_vector}s and the presence of a \texttt{generic} which allows to size the component to suit one's needs.
+
+\section{PIPO Shift Register}\label{sec:PIPOShiftReg.vhd}
+\lstset{style=codestyle}\label{code:PIPOShiftReg.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the PIPO Shift Register}]{code/PIPOShiftReg.vhd}
+\hfill \break
+Listing \ref{code:PIPOShiftReg.vhd} shows the source code for the PIPO Shift Register. As mentioned in \ref{subsec:PIPOshiftreg}, its building unit is the D2FF. The presence of the generic \texttt{ShiftLen} at line 4 made this component suitable for both the chosen architectures: \texttt{ShiftLen} will be equal to 1 for the bitwise logic and it will be equal to 8 for the bytewise logic.\\
+The port maps at lines 32 and 45 to the \texttt{en} input of the D2FF are set to \texttt{1} since in neither of the architectures there is the need to stop the shifting.\\
+%If one were to add the handshake mechanism mentioned at the end of chapter \ref{ch:architecture}, the \texttt{en} could be controlled by an expanded Control Unit that would then be able to pause and resume the shifting.
+
+\section{XOR logical}\label{sec:XOR_logical.vhd}
+\lstset{style=codestyle}\label{code:XOR_logical.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the XOR logical component}]{code/XOR_logical.vhd}
+\hfill \break
+The \textbf{XOR\_logical} component is a combinatorial component which implements a single subtraction step needed for the polynomial long division procedure.\\
+It computes the XOR between the 8 least significant bits of the input and the generator. As mentioned in \ref{sec:bitwise_arch}, the input most significant bit is used as an ``enable", i.e. when it is \texttt{0} the circuit simply outputs the input 8 least significant bit. This is implemented in line 17 by exploiting the fact that \texttt{0} is the neutral element of the XOR operation.\\
+
+\section{XOR LUT}\label{sec:XOR_LUT.vhd}
+\lstset{style=codestyle}\label{code:XOR_LUT.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the XOR LUT component}]{code/XOR_LUT.vhd}
+\hfill \break
+The \textbf{XOR\_LUT} component is again a combinatorial component which contains a look-up table for the specified generator polynomial.\\
+It computes the XOR between the 8 least significant bits of the input and the generator. The input is converted into an integer and then used as an index to retrieve the corresponding entry of the LUT.\\
+Since the input is 8 bits long and so are the output, the total size of the LUT is 256 B.\\
+The LUT was generated with a simple Python script.
+\pagebreak
+\section{Control Unit}\label{sec:control_unit.vhd}
+
+\dirtree{%
+.1 CRC/src/control\_unit/.
+.2 fullAdder.vhd.
+.2 rippleCarryAdder.vhd.
+.2 counter.vhd.
+.2 controlUnit.vhd.
+}
+\hfill \break
+The \texttt{control\_unit} directory contains the source code for the Control Unit along with the subcomponent it is made of.\\
+The source code of the \textbf{full adder} and the \textbf{ripple-carry adder} will not be shown here since they are both very simple.
+
+\subsection{Counter}\label{subsec:counter.vhd}
+\lstset{style=codestyle}\label{code:counter.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the Counter}]{code/counter.vhd}
+\hfill \break
+Listing \ref{code:counter.vhd} shows the VHDL source code for the Counter.\\
+It is made of a ripple-carry adder, a register of D Flip-Flop and some logic to wrap the count back to 0 when the maximum value is reached.\\
+As with the PIPO Shift Register, this Counter also has a generic which allows the user to set the max count. When instancing a Control Unit component (v. next subsection), this will also have a generic for the number of cycles; this generic will be inherited by the Counter generic. %TODO rephrase? improve?
+\\
+\pagebreak
+\subsection{Control Unit}\label{subsec:controlUnit.vhd}
+\lstset{style=codestyle}\label{code:controlUnit.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the Control Unit}]{code/controlUnit.vhd}
+Listing \ref{code:controlUnit.vhd} shows the VHDL source code of the Control Unit.\\
+Thanks to the generic \texttt{CU\_cycles}, both the CRC architectures can use the same \textit{ControlUnit} component, by just changing the generic map upon instantiation.\\
+This was made possible by avoiding the so-called ``magic numbers" in the code and by noticing that all the phases can be defined in terms of the same offsets with respect to the start or the end of the computation, regardless of the architecture.
+\pagebreak
+
+\section{Bitwise CRC}\label{sec:CRCbitwise.vhd}
+\lstset{style=codestyle}\label{code:CRC_bitwise.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the bitwise architecture of the CRC}]{code/CRC_bitwise.vhd}
+\hfill \break
+Listing \ref{code:CRC_bitwise.vhd} shows the VHDL source code of the bitwise architecture of the CRC. Components and constants declarations were omitted to avoid cluttering, as well as the clock and reset mapping for each component. Please refer to the repository for the full source code.\\
+The structure of the CRC source code is actually quite straightforward, as it mainly consists of the previously shown subcomponents and signals that interconnect them.\\
+The \texttt{mux\_proc} process at line 123, as the name suggests, implements the multiplexing process that feeds the 8 least significant bits into the shift register, depending on the value of \texttt{MD}.\\
+The signal assignments at the end of the architecture use the concatenation operator \texttt{\&} to implement the ``merging" of the signals.
+
+\section{LUT-based CRC}\label{sec:CRC_LUT.vhd}
+Given the strong similarity of the LUT-based CRC implementation with respect to the bitwise one, below is a highly reduced version of VHDL source code of the former, which only contains the parts that differ from listing \ref{code:CRC_bitwise.vhd}.\\
+It is worth mentioning that the CRC ``interface" (i.e. the set of input and output ports) is obviously the same in both architectures and compliant with the project specifications.
+
+\lstset{style=codestyle}\label{code:CRC_LUT.vhd}
+\lstinputlisting[language=VHDL,caption={VHDL source code of the LUT-based architecture of the CRC}]{code/CRC_LUT.vhd}
+\hfill \break
+As listing \ref{code:CRC_LUT.vhd} shows, the only few differences with the bitwise version are some minor changes in the size of some signals and registers, the presence of the \textbf{XOR\_LUT} combinatorial block in place of the previously used \textbf{XOR\_logical} and the assignment to the \texttt{accum\_d1} signal at line 54. At each step, the next input of the accumulator consists of the bitwise XOR between the appropriate LUT entry and the next byte in the message.
